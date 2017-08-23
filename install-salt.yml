@@ -1,0 +1,20 @@
+- hosts: all
+  tasks:
+  - name: download install shell script
+    get_url: 
+      url: https://bootstrap.saltstack.com
+      dest: /tmp/install_salt.sh
+      mode: 0400
+  - name: run shell 
+    command: bash /tmp/install_salt.sh -P
+    async: 100
+    poll: 0
+  - name: remove shell file
+    command: rm -rf /tmp/install_salt.sh
+  - name: upload minion conf file
+    template: 
+      src: /templates/minion.j2 
+      dest: /etc/salt/minion
+  - name: runserver
+    service: salt-minion
+    state: restarted
