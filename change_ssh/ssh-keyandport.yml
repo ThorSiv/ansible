@@ -1,0 +1,26 @@
+- hosts: data
+  user: root
+  tasks:
+   - name: change sshd port to 7168
+     lineinfile:
+       path: /etc/ssh/sshd_config
+       regexp: "#Port 22"
+       line: "Port 7168"
+       state: present
+     notify:
+       - restart sshd
+
+   - name: push authorized keys
+     authorized_key:
+       user: root
+       state: present
+       key: "{{ item }}"
+       # exclusive: True
+     with_items: 
+      - http://pypi.idiaoyan.com/rsa/33.pub
+      - http://pypi.idiaoyan.com/rsa/34.pub
+  handlers:
+    - name: restart sshd
+      service:
+        name: sshd
+        state: restarted
